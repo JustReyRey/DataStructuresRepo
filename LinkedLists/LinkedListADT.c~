@@ -1,0 +1,132 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "LinkedListAPI.h"
+#include "car.h"
+
+List *initializeList(void (*printFunction)(void *toBePrinted),void (*deleteFunction)(void *toBeDeleted),int (*compareFunction)(const void *first,const void *second)){
+List *list = malloc(sizeof(List));
+list->head = NULL;
+list->tail = NULL;
+ list->printNode = printFunction;
+ list->deleteNode = deleteFunction;
+ list->compare = compareFunction;
+return list;
+}
+
+Node *initializeNode (void *data){
+	Node *newNode = malloc(sizeof(Node));
+	newNode->data = data;
+	newNode->next = NULL;
+	newNode->prev = NULL;
+	return newNode;
+}
+
+
+void insertFront (List *list,void *toBeAdded){
+	Node* newNode = initializeNode(toBeAdded);
+ 	
+	if(list->head == NULL){
+	  list->head = newNode;
+	  list->tail = newNode;
+	  return;
+	}
+	newNode->next = list->head;
+	list->head->prev = newNode;
+	list->head = newNode;
+}
+
+
+void insertBack (List *list,void *toBeAdded){
+	Node* newNode = initializeNode(toBeAdded);
+
+	if(list->tail == NULL){
+	  list->head = newNode;
+	  list->tail = newNode;
+	  return;
+	}
+	newNode->prev = list->tail;
+	list->tail->next = newNode;
+	list->tail = newNode;
+}
+
+
+
+void *getFromFront (List *list){
+  Node *temp = list->head->data;
+ return temp;
+}
+
+void *getFromBack (List *list){
+  Node *temp = list->tail->data;
+
+ return temp;
+}
+
+void printForward(List *list){
+  Node* current = list->head;
+  void (*funcPrint)(void* toPrint);
+  funcPrint = list->printNode;
+  
+  while (current != NULL){
+    funcPrint(current->data);
+    current = current->next;
+  }
+
+}
+
+void printBackwards(List *list){
+  Node* current = list->tail;
+  void (*funcPrint)(void* toPrint);
+  funcPrint = list->printNode;
+  while (current != NULL){
+    funcPrint(current->data);
+    current = current->prev;
+  }
+}
+
+
+
+
+int deleteNodeFromList (List *list, void *toBeDeleted){
+
+	Node* temp = list->head;
+	if(temp != NULL && temp->data == toBeDeleted){
+	  list->head = temp->next;
+	  free(temp->data);
+	  free(temp);
+	  return 0;
+	}
+	
+	Node *prev;
+	while (temp != NULL && temp->data != toBeDeleted){
+          prev = temp;
+	  temp->data = prev->data;
+  	  temp = temp->next;
+	}
+
+	if (temp == NULL){
+	  return -1;
+	}
+
+	prev->next = temp->next;
+	free(temp->data);
+	free(temp);
+		
+	return 0;
+}
+
+void deleteList(List *list){
+	
+	Node *current = list->head;
+	Node *next = current;
+	while (current != NULL){ 
+	  next = current->next;
+	  free(current->data);
+	  free(current);
+	  current = next;
+	}
+	free(next);
+	free(current);
+	free(list);
+
+}
